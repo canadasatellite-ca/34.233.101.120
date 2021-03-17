@@ -1,0 +1,36 @@
+[Unit]
+After=network.target
+After=syslog.target
+Description=MariaDB database server
+
+[Install]
+Alias=mysql.service
+Alias=mysqld.service
+WantedBy=multi-user.target
+
+[Service]
+CapabilityBoundingSet=CAP_IPC_LOCK
+ExecStart=/usr/sbin/mysqld $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $_WSREP_START_POSITION
+ExecStartPost=/etc/mysql/debian-start
+ExecStartPost=/bin/sh -c "systemctl unset-environment _WSREP_START_POSITION"
+ExecStartPre=/usr/bin/install -m 755 -o mysql -g root -d /var/run/mysqld
+ExecStartPre=/bin/sh -c "systemctl unset-environment _WSREP_START_POSITION"
+ExecStartPre=/bin/sh -c "[ ! -e /usr/bin/galera_recovery ] && VAR= || \
+ VAR=`/usr/bin/galera_recovery`; [ $? -eq 0 ] \
+ && systemctl set-environment _WSREP_START_POSITION=$VAR || exit 1"
+Group=mysql
+KillMode=process
+KillSignal=SIGTERM
+LimitNOFILE=16364
+PermissionsStartOnly=true
+PrivateDevices=false
+PrivateNetwork=false
+PrivateTmp=false
+ProtectHome=false
+ProtectSystem=
+ReadWritePaths=
+Restart=on-abort
+RestartSec=5s
+SendSIGKILL=no
+Type=notify
+User=mysql
