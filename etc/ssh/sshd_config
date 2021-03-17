@@ -1,0 +1,37 @@
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+AllowTcpForwarding yes
+AuthorizedKeysFile     %h/.ssh/authorized_keys
+ChallengeResponseAuthentication no
+ClientAliveCountMax 3333
+# http://fredericiana.com/2009/10/21/keeping-ssh-from-disconnecting-automatically
+ClientAliveInterval 300
+HostKey /etc/ssh/ssh_host_dsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostbasedAuthentication no
+IgnoreRhosts yes
+IgnoreUserKnownHosts no
+KeepAlive yes
+KeyRegenerationInterval 3600
+LogLevel INFO
+LoginGraceTime 3600
+PasswordAuthentication yes
+PermitEmptyPasswords no
+PermitRootLogin yes
+Port 22
+PrintLastLog yes
+PrintMotd no
+Protocol 2
+PubkeyAuthentication yes
+RSAAuthentication yes
+RhostsRSAAuthentication no
+StrictModes yes
+Subsystem sftp /usr/lib/openssh/sftp-server
+SyslogFacility AUTH
+TCPKeepAlive yes
+UsePAM yes
+UsePrivilegeSeparation yes
+X11DisplayOffset 10
+X11Forwarding yes
