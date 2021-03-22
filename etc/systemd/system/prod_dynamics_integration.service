@@ -1,0 +1,21 @@
+[Unit]
+After=mysqld.service redis.service
+Description=Production Dynamics Integration Daemon Service
+Requires=mysqld.service redis.service
+StartLimitBurst=30
+StartLimitInterval=60
+
+[Service]
+ExecStart=/usr/bin/php /var/www/sites/canadasatellite.ca/httpdocs/bin/magento simple_amqp:consumers:start prod_dynamics_integration.updates
+KillMode=process
+PIDFile=/var/run/prod_dynamics_integration.pid
+Restart=always
+RestartSec=10s
+StandardError=journal
+StandardOutput=journal
+TimeoutSec=0
+Type=simple
+User=www-data
+
+[Install]
+WantedBy=default.target
