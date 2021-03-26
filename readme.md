@@ -6,5 +6,14 @@ service cron restart
 service mysql restart
 service nginx restart
 service php7.2-fpm restart
-service redis restart
+service rabbitmq-server restart
+```
+
+## A service's status
+```
+service cron status
+service mysql status
+service nginx status
+service php7.2-fpm status
+service rabbitmq-server status
 ```
