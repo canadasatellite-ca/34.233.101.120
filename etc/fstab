@@ -2,7 +2,11 @@ LABEL=cloudimg-rootfs	/	 ext4	defaults,discard	0 0
 /dev/xvdb1	/var/www	ext4	defaults,nofail	0	2
 /dev/xvdc1	/_sitebackup	ext4	defaults,nofail	0	2
 #mediacanadasatellite /var/www/sites/canadasatellite.ca/httpdocs/pub/s3-media fuse.s3fs _netdev,allow_other 0 0 -o
-/_sitebackup/swapfile     swap     swap     defaults     0     0
+#/_sitebackup/swapfile     swap     swap     defaults     0     0
 # 2021-03-16 Dmitry Fedyuk https://www.upwork.com/fl/mage2pro
 # "How did I fix the «Can't create test file» MariaDB / MySQL error?": https://df.tips/t/1076
 /var/www/mysql /var/lib/mysql none bind 0 0
+# 2021-03-28 Dmitry Fedyuk https://www.upwork.com/fl/mage2pro
+# It could fix the «SQLSTATE[HY000] [2002] No such file or directory» issue.
+# https://askubuntu.com/a/178726
+/var/www/swap swap swap sw 0 0
