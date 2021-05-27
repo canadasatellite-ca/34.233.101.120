@@ -1,0 +1,77 @@
+map $geoip_country_code $new_home_uri { 
+    default	/;
+    GB		/uk/;
+    NL		/nl/;
+    DE		/de/;
+    ES		/es/;
+    FR		/fr/;
+    IT		/it/;
+    UA		/it/;
+} 
+
+
+# Put to location / {
+#	rewrite ^ $new_home_uri break; 
+#	}
+
+#nginx-bp/maps/cointry_to_redirect.conf;
+# ISO 3166-1
+# https://en.wikipedia.org/wiki/ISO_3166-1
+
+
+map $geoip2_data_country_code $country_url {
+     default example.com; ##This is the US version
+     GB      example.com/uk;
+     CA      example.com/ca;
+}
+
+server {
+    listen 443 ssl spdy default_server;
+    server_name example.com;
+    root /var/www/html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args; 
+        if ($http_cookie !~ "country=set") {                            
+            add_header Set-Cookie "country=set;Max-Age=31536000";
+            rewrite ^ $scheme://$country_url$request_uri break;
+            }
+    }
+
+    location /uk {
+        try_files $uri $uri/ /uk/index.php?$args;  
+        if ($http_cookie !~ "country=set") {                            
+            add_header Set-Cookie "country=set;Max-Age=31536000";
+            rewrite ^ $scheme://$country_url$request_uri break;
+            } 
+    }
+
+    location /ca {  
+        try_files $uri $uri/ /ca/index.php?$args;   
+        if ($http_cookie !~ "country=set") {                            
+            add_header Set-Cookie "country=set;Max-Age=31536000";
+            rewrite ^ $scheme://$country_url$request_uri break;
+            }
+    }
+
+    ##Other locations
+    }
+
+http {
+...
+map $geoip_country_code $georedirect {
+  default 0;
+  MY 1;
+}
+...
+}
+
+server {
+...
+location /featured/abc/ {
+  if ($georedirect) {
+    return 301 https://www.youtube.com/watch?v=MaMuQPmzrrU;
+  }
+}
+...
+}
