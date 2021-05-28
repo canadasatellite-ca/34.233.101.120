@@ -1,0 +1,83 @@
+# reuseport works in 1.9.1 version only
+server {
+	listen		80; #reuseport; #default
+#	listen		[::]:80; #default ipv6only=on;
+	server_name	@@HOSTNAME@@ www.@@HOSTNAME@@;
+	root		@@PATH@@;
+	access_log	/var/log/nginx/@@HOSTNAME@@-access.log combined buffer=32k;
+	error_log	/var/log/nginx/@@HOSTNAME@@-error.log error;
+	index		index.html index.htm index.php;
+	include		nginx-bp/methods.conf;
+	include		nginx-bp/system.conf;
+	include		nginx-bp/favicon.conf;
+	include		nginx-bp/static.conf;
+	include		nginx-bp/nocache.conf;
+	include		nginx-bp/forbidrules.conf;
+#	include		nginx-bp/pagespeed-per-site.conf;
+#	include		nginx-bp/phpredisadmin.conf;
+#	include		nginx-bp/phpmyadmin.conf;
+#	include		nginx-bp/stats.conf;
+
+	port_in_redirect off;
+
+#	if ($bad_client) { return 403; }
+
+	location ~ \.(ttf|ttc|otf|eot|woff|font.css|css)$ {
+#		add_header Access-Control-Allow-Origin "*";
+	}
+
+	location /
+	{
+	    try_files $uri $uri/ @handler;
+        expires 1s;
+	}
+
+        location /app/                  { deny all; }
+        location /includes/             { deny all; }
+        location /lib/                  { deny all; }
+        location /media/downloadable/   { deny all; }
+        location /pkginfo/              { deny all; }
+        location /report/config.xml     { deny all; }
+        location /scripts/              { deny all; }
+        location /var/                  { deny all; }
+        location /var/export/ { ## Allow admins only to view export folder
+            auth_basic				"Restricted"; ## Message shown in login window
+            auth_basic_user_file	/etc/nginx/.htpasswd; ## See /etc/nginx/.htpasswd;
+            autoindex				on;
+        }
+
+		if ($request_uri = /index.php) {
+			rewrite ^ http://$host? permanent; #301 redirect
+		}
+
+		rewrite ^([^.]*[^/])$ $1/ permanent; ## adding slash to the end in links without . in path 
+        
+        location @handler {
+        	rewrite / /index.php;
+        }
+
+        location ~ .php/ { ## Forward paths like /js/index.php/x.js to relevant handler
+            rewrite ^(.*.php)/ $1 last;
+        }
+
+	location ~ ^.+\.php(?:/.*)?$ {
+	    if (!-e $request_filename)  { rewrite / /index.php last; } ## Catch 404s that try_files miss
+#		expires                     off; ## Do not cache dynamic content
+		fastcgi_pass                unix:/var/run/php5-fpm.sock;
+		fastcgi_param               SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+#		fastcgi_param               MAGE_RUN_CODE default; ## Store code is defined in administration > Configuration > Manage Stores
+#		fastcgi_param               MAGE_RUN_TYPE store;
+		fastcgi_param				SERVER_PORT 80; ## It should fix Internal Redirects when Varnish is on 80 port (login problem or redirect to base URL instead a page). 
+		include                     fastcgi_params; ## See /etc/nginx/fastcgi_params
+		fastcgi_keep_conn           on;
+		fastcgi_hide_header         "X-Powered-By";
+		limit_req                   zone=reqPerSec100  burst=500 nodelay;
+		limit_conn					conPerIp 50;
+		add_header					X-Configured-by "Console.Support";
+		add_header                  X-Time-Spent $request_time;
+		add_header                  X-Cache-status $upstream_cache_status;
+		add_header                  X-Frame-Options SAMEORIGIN;
+		add_header                  X-Content-Type-Options nosniff;
+		add_header                  X-XSS-Protection "1; mode=block";
+	}
+}
