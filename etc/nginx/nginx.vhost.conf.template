@@ -28,7 +28,6 @@ server {
 #	include		nginx-bp/cacheloggeduser-wp.conf;
 #	include		nginx-bp/status.conf;
 #	include		nginx-bp/roundcube.conf;
-#	include		nginx-bp/woocommerce.conf;
 #	include		nginx-bp/w3-total-cache.conf;
 
 #	if ($sb_allow = no) {
