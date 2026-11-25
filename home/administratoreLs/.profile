@@ -4,7 +4,7 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 PATH="$HOME/bin:$HOME/.local/bin:$PATH"
-# 2021-03-15 Dmitry Fedyuk https://www.upwork.com/fl/mage2pro
+# 2021-03-15 Dmitry Fedyuk https://github.com/dmitrii-fediuk
 export PS1='\[\e[01;33m\]\w\n\[\e[38;5;028m\]\$ \[\e[00m\]'
 eval "`dircolors`"
 alias ...='cd ../..'

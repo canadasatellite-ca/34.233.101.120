@@ -4,7 +4,7 @@ if [ "$BASH" ]; then
   fi
 fi
 
-# 2021-03-15 Dmitry Fedyuk https://www.upwork.com/fl/mage2pro
+# 2021-03-15 Dmitry Fedyuk https://github.com/dmitrii-fediuk
 export PS1='\[\e[01;33m\]\w\n\[\e[01;31m\]\$ \[\e[00m\]'
 umask 022
 eval "`dircolors`"
